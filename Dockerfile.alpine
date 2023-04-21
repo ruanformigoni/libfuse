@@ -1,0 +1,21 @@
+FROM alpine:latest
+
+
+# Install deps
+RUN apk update && apk upgrade
+RUN apk add --no-cache git build-base linux-headers libbsd-dev fuse-dev libtool \
+  autoconf automake gettext-dev
+
+# Fetch source
+# RUN mkdir libfuse
+# COPY . /libfuse
+RUN git clone https://github.com/ruanformigoni/libfuse.git
+WORKDIR libfuse
+
+# Compile
+RUN git reset --hard 5a43d0f
+RUN ./makeconf.sh && ./configure && make
+
+# Create static binary
+RUN mkdir -p dist
+RUN cp lib/.libs/libfuse.a dist
